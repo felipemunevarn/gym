@@ -5,12 +5,14 @@ public class User {
     private String firstName;
     private String lastName;
     private String password;
+    private boolean isActive;
 
     public User(String username, String firstName, String lastName, String password) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
+        this.isActive = true;
     }
     public String getUsername() {
         return username;
@@ -35,6 +37,12 @@ public class User {
     }
     public void setPassword(String password) {
         this.password = password;
+    }
+    public boolean isActive() {
+        return isActive;
+    }
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }
 

@@ -46,4 +46,13 @@ class UserTest {
 
         assertEquals("newpassword", user.getPassword());
     }
+
+    @Test
+    void testSetActive() {
+        User user = new User("john_doe", "John", "Doe", "password123");
+        assertTrue(user.isActive());
+        user.setActive(false);
+
+        assertFalse(user.isActive());
+    }
 }
