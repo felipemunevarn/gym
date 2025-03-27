@@ -7,27 +7,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.epam.service.TraineeService;
+import com.epam.service.TrainerService;
 
 @Component
 public class GymFacade {
     private final TraineeService traineeService;
-    // private final TrainerService trainerService;
-    // private static Logger logger = LoggerFactory.getLogger(GymFacade.class);
+    private final TrainerService trainerService;
     private Logger logger = LoggerFactory.getLogger(GymFacade.class);
 
     @Autowired
-    public GymFacade(TraineeService ts) { //, TrainerService trs, TrainingService tgs) {
+    public GymFacade(TraineeService ts, TrainerService trs) {//, TrainingService tgs) {
         this.traineeService = ts;
-        // this.trainerService = trs;
+        this.trainerService = trs;
         // this.trainingService = tgs;
     }
 
-    // Methods to interact with services
+    // public TraineeService getTraineeService() {
+    //     return traineeService;
+    // }
+    // public TrainerService getTrainerService() {
+    //     return trainerService;
+    // }
 
-    public TraineeService getTraineeService() {
-        return traineeService;
-    }
-
+    // Trainee methods    
     public void createTrainee(String firstName, String lastName, String dateOfBirth, String address) {
         traineeService.create(firstName, lastName, dateOfBirth, address);
         logger.info("Trainee created successfully");
@@ -49,6 +51,26 @@ public class GymFacade {
             logger.info("Trainee found successfully");
         } catch (IllegalArgumentException e) {
             logger.error("Trainee not found");
+        }
+    }
+
+    // Trainer methods
+    public void createTrainer(String firstName, String lastName, String specialization) {
+        trainerService.create(firstName, lastName, specialization);
+        logger.info("Trainer created successfully");
+    }
+
+    public void updateTrainer(String username, String specialization) {
+        trainerService.update(username, specialization);
+        logger.info("Trainer updated successfully");
+    }
+
+    public void findTrainerByUsername(String username) {
+        try {
+            trainerService.findByUsername(username);
+            logger.info("Trainer found successfully");
+        } catch (IllegalArgumentException e) {
+            logger.error("Trainer not found");
         }
     }
 }

@@ -14,7 +14,6 @@ public class TraineeService {
     @Autowired
     private TraineeDAO traineeDAO;
 
-    // method to create a trainee
     public Trainee create(String firstName, String lastName, String dateOfBirth, String address) {
         String username = generateUsername(firstName, lastName);
         String password = generatePassword();
@@ -23,7 +22,6 @@ public class TraineeService {
         return trainee;
     }
 
-    // method to update a trainee
     public Optional<Trainee> update(String username, String dateOfBirth, String address) {
         if (!traineeDAO.exists(username)) {
             throw new IllegalArgumentException("Trainee with username " + username + " not found"); // condition is not defined
@@ -34,7 +32,6 @@ public class TraineeService {
         return Optional.of(trainee);
     }
 
-    // method to delete a trainee
     public void delete(String username) throws IllegalArgumentException {
         if (!traineeDAO.exists(username)) {
             throw new IllegalArgumentException("Trainee with username " + username + " not found"); // condition is not defined
@@ -42,7 +39,6 @@ public class TraineeService {
         traineeDAO.delete(username);
     }
 
-    // method to find a trainee by username
     public Optional<Trainee> findByUsername(String username) throws IllegalArgumentException {
         if (!traineeDAO.exists(username)) {
             throw new IllegalArgumentException("Trainee with username " + username + " not found");
