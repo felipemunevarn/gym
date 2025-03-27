@@ -28,8 +28,8 @@ public class GymFacade {
         return traineeService;
     }
 
-    public void createTrainee(String firstName, String lastName, String dateOfBirth, String email) {
-        traineeService.create(firstName, lastName, dateOfBirth, email);
+    public void createTrainee(String firstName, String lastName, String dateOfBirth, String address) {
+        traineeService.create(firstName, lastName, dateOfBirth, address);
         logger.info("Trainee created successfully");
     }
 
