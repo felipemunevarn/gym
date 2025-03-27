@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 import com.epam.model.Trainee;
+import com.epam.model.Trainer;
+
 import jakarta.annotation.PostConstruct;
 
 @Configuration
@@ -22,17 +24,28 @@ public class AppConfig {
 
     @Value("${storage.trainee.file}")
     private String traineeFilePath;
+    @Value("${storage.trainer.file}")
+    private String trainerFilePath;
 
     @Bean
     public Map<String, Trainee> traineeStorage() {
         return new HashMap<>();
     }
 
+    @Bean
+    public Map<String, Trainer> trainerStorage() {
+        return new HashMap<>();
+    }
+
     @PostConstruct
     public void initializeTraineeStorage() throws IOException {
-        Map<String, Trainee> storage = traineeStorage();
-        Map<String, Trainee> loaded = loadFromFile(traineeFilePath, Trainee.class);
-        storage.putAll(loaded);
+        Map<String, Trainee> traineeStorage = traineeStorage();
+        Map<String, Trainee> teLoaded = loadFromFile(traineeFilePath, Trainee.class);
+        traineeStorage.putAll(teLoaded);
+        
+        Map<String, Trainer> trainerStorage = trainerStorage();
+        Map<String, Trainer> trLoaded = loadFromFile(trainerFilePath, Trainer.class);
+        trainerStorage.putAll(trLoaded);
     }
 
     private <T> Map<String, T> loadFromFile(String file, Class<T> type) {
@@ -41,13 +54,13 @@ public class AppConfig {
             String line;
             while ((line = reader.readLine()) != null) {
             String[] parts = line.split(",");
-                // if (type == Trainee.class) {
+                if (type == Trainee.class) {
                     T entity = type.cast(new Trainee(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]));
                     storage.put(parts[0], entity);
-                // } else if (type == Trainer.class) {
-                //     T entity = type.cast(new Trainer(parts[0], parts[1], parts[2], parts[3], parts[4]));
-                //     storage.put(parts[0], entity);
-                // }
+                } else if (type == Trainer.class) {
+                    T entity = type.cast(new Trainer(parts[0], parts[1], parts[2], parts[3], parts[4]));
+                    storage.put(parts[0], entity);
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException("Error reading file: " + file, e);

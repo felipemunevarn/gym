@@ -1,6 +1,7 @@
 package com.epam.config;
 
 import com.epam.model.Trainee;
+import com.epam.model.Trainer;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -18,56 +19,74 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringJUnitConfig(AppConfig.class)
 public class AppConfigTest {
 
-    private static Path tempFile;
+    private static Path tempFileTrainee;
+    private static Path tempFileTrainer;
 
     @BeforeAll
     static void setup() throws IOException {
-        tempFile = Files.createTempFile("test-trainee", ".txt");
-        Files.write(tempFile, List.of(
+        tempFileTrainee = Files.createTempFile("test-trainee", ".txt");
+        Files.write(tempFileTrainee, List.of(
             "john.doe,John,Doe,pass123,01-01-2000,elm street 123",
             "jane.smith,Jane,Smith,pass456,02-02-2000,742 evergreen terrace"
+        ));
+        
+        tempFileTrainer = Files.createTempFile("test-trainer", ".txt");
+        Files.write(tempFileTrainer, List.of(
+            "john.doe,John,Doe,pass123,stretching",
+            "jane.smith,Jane,Smith,pass456,yoga"
         ));
     }
 
     @AfterAll
     static void cleanup() throws IOException {
-        Files.deleteIfExists(tempFile);
+        Files.deleteIfExists(tempFileTrainee);
+        Files.deleteIfExists(tempFileTrainer);
     }
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
-        registry.add("storage.trainee.file", () -> tempFile.toString());
+        registry.add("storage.trainee.file", () -> tempFileTrainee.toString());
+        registry.add("storage.trainer.file", () -> tempFileTrainer.toString());
     }
 
     @Autowired
     private Map<String, Trainee> traineeStorage;
+    @Autowired
+    private Map<String, Trainer> trainerStorage;
 
     @Test
     void testTraineeStorageInitialization() {
-        // Check map size
         assertEquals(2, traineeStorage.size());
+        assertEquals(2, trainerStorage.size());
 
-        // Verify entries exist
         assertTrue(traineeStorage.containsKey("john.doe"));
         assertTrue(traineeStorage.containsKey("jane.smith"));
+        assertTrue(trainerStorage.containsKey("john.doe"));
+        assertTrue(trainerStorage.containsKey("jane.smith"));
 
-        // Check first trainee details
-        Trainee john = traineeStorage.get("john.doe");
-        assertNotNull(john);
-        assertEquals("John", john.getFirstName());
-        assertEquals("Doe", john.getLastName());
-        // assertEquals("john@example.com", john.getEmail());
-        assertEquals("pass123", john.getPassword());
-        // assertEquals("101", john.getId());
+        Trainee johnTe = traineeStorage.get("john.doe");
+        assertNotNull(johnTe);
+        assertEquals("John", johnTe.getFirstName());
+        assertEquals("Doe", johnTe.getLastName());
+        assertEquals("pass123", johnTe.getPassword());
 
-        // Check second trainee details
-        Trainee jane = traineeStorage.get("jane.smith");
-        assertNotNull(jane);
-        assertEquals("Jane", jane.getFirstName());
-        assertEquals("Smith", jane.getLastName());
-        // assertEquals("jane@example.com", jane.getEmail());
-        assertEquals("pass456", jane.getPassword());
-        // assertEquals("102", jane.getId());
+        Trainer johnTr = trainerStorage.get("john.doe");
+        assertNotNull(johnTr);
+        assertEquals("John", johnTr.getFirstName());
+        assertEquals("Doe", johnTr.getLastName());
+        assertEquals("stretching", johnTr.getSpecialization());
+
+        Trainee janeTe = traineeStorage.get("jane.smith");
+        assertNotNull(janeTe);
+        assertEquals("Jane", janeTe.getFirstName());
+        assertEquals("Smith", janeTe.getLastName());
+        assertEquals("pass456", janeTe.getPassword());
+        
+        Trainer janeTr = trainerStorage.get("jane.smith");
+        assertNotNull(janeTr);
+        assertEquals("Jane", janeTr.getFirstName());
+        assertEquals("Smith", janeTr.getLastName());
+        assertEquals("pass456", janeTr.getPassword());
     }
 
     @Test
