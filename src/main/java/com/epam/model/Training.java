@@ -1,14 +1,18 @@
 package com.epam.model;
 
+import java.util.UUID;
+
 public class Training {
+    private String id;
     private String traineeName;
     private String trainerName;
-    TrainingType.Type trainingType;
+    TrainingType trainingType;
     private String name;
     private String date;
     private String duration;
 
-    public Training(String traineeName, String trainerName, TrainingType.Type trainingType, String name, String date, String duration) {
+    public Training(String traineeName, String trainerName, TrainingType trainingType, String name, String date, String duration) {
+        this.id = UUID.randomUUID().toString();
         this.traineeName = traineeName;
         this.trainerName = trainerName;
         this.trainingType = trainingType;
@@ -16,6 +20,12 @@ public class Training {
         this.date = date;
         this.duration = duration;
     }
+    public String getId() {
+        return id;
+    }
+    // public void setId(String id) {
+    //     this.id = id;
+    // }
     public String getTraineeName() {
         return traineeName;
     }
@@ -28,10 +38,10 @@ public class Training {
     public void setTrainerName(String trainerName) {
         this.trainerName = trainerName;
     }
-    public TrainingType.Type getTrainingType() {
+    public TrainingType getTrainingType() {
         return trainingType;
     }
-    public void setTrainingType(TrainingType.Type trainingType) {
+    public void setTrainingType(TrainingType trainingType) {
         this.trainingType = trainingType;
     }
     public String getName() {

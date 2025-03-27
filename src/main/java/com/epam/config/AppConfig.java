@@ -14,6 +14,8 @@ import org.springframework.context.annotation.PropertySource;
 
 import com.epam.model.Trainee;
 import com.epam.model.Trainer;
+import com.epam.model.Training;
+import com.epam.model.TrainingType;
 
 import jakarta.annotation.PostConstruct;
 
@@ -26,6 +28,8 @@ public class AppConfig {
     private String traineeFilePath;
     @Value("${storage.trainer.file}")
     private String trainerFilePath;
+    @Value("${storage.training.file}")
+    private String trainingFilePath;
 
     @Bean
     public Map<String, Trainee> traineeStorage() {
@@ -36,16 +40,28 @@ public class AppConfig {
     public Map<String, Trainer> trainerStorage() {
         return new HashMap<>();
     }
+    
+    @Bean
+    public Map<String, Training> trainingStorage() {
+        return new HashMap<>();
+    }
 
     @PostConstruct
     public void initializeTraineeStorage() throws IOException {
+        // trainee
         Map<String, Trainee> traineeStorage = traineeStorage();
         Map<String, Trainee> teLoaded = loadFromFile(traineeFilePath, Trainee.class);
         traineeStorage.putAll(teLoaded);
         
+        // trainer
         Map<String, Trainer> trainerStorage = trainerStorage();
         Map<String, Trainer> trLoaded = loadFromFile(trainerFilePath, Trainer.class);
         trainerStorage.putAll(trLoaded);
+
+        //training
+        Map<String, Training> trainingStorage = trainingStorage();
+        Map<String, Training> tgLoaded = loadFromFile(trainingFilePath, Training.class);
+        trainingStorage.putAll(tgLoaded);
     }
 
     private <T> Map<String, T> loadFromFile(String file, Class<T> type) {
@@ -59,6 +75,9 @@ public class AppConfig {
                     storage.put(parts[0], entity);
                 } else if (type == Trainer.class) {
                     T entity = type.cast(new Trainer(parts[0], parts[1], parts[2], parts[3], parts[4]));
+                    storage.put(parts[0], entity);
+                } else if (type == Training.class) {
+                    T entity = type.cast(new Training(parts[1], parts[2], TrainingType.valueOf(parts[3]), parts[4], parts[5], parts[6]));
                     storage.put(parts[0], entity);
                 }
             }
