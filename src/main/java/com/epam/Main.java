@@ -4,6 +4,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import com.epam.config.AppConfig;
 import com.epam.facade.GymFacade;
+import com.epam.model.TrainingType;
 
 public class Main {
     public static void main(String[] args) {
@@ -14,6 +15,7 @@ public class Main {
         GymFacade facade = context.getBean("gymFacade", GymFacade.class);
         facade.createTrainee("John", "Doe", "01/01/2000", "123 Main St");
         facade.createTrainer("John", "Doe", "yoga");
+        facade.createTraining("John.Doe", "John.Doe1", TrainingType.YOGA, "morning yoga", "28-03-2025", "1 and a half hours");
         facade.findTraineeByUsername("John.Doe");
         facade.findTrainerByUsername("John.Doe");
         facade.findTraineeByUsername("John.Doe1");
@@ -22,8 +24,8 @@ public class Main {
         facade.findTrainerByUsername("John.Doe2");
         facade.findTraineeByUsername("John.Doe10");
         facade.findTrainerByUsername("John.Doe10");
-        // System.out.println(facade.getTraineeService().findByUsername("John.Doe"));
-        
+        facade.findTrainingById("training001");
+        facade.findTrainingById("training007");
         context.close();
     }
 }

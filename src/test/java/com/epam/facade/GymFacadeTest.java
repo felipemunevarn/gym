@@ -1,7 +1,9 @@
 package com.epam.facade;
 
+import com.epam.model.TrainingType;
 import com.epam.service.TraineeService;
 import com.epam.service.TrainerService;
+import com.epam.service.TrainingService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,8 @@ class GymFacadeTest {
     private TraineeService traineeService;
     @Mock
     private TrainerService trainerService;
+    @Mock
+    private TrainingService trainingService;
 
     @Mock
     private Logger logger; // Mock the logger
@@ -30,7 +34,7 @@ class GymFacadeTest {
 
     @BeforeEach
     void injectMockLogger() throws NoSuchFieldException, IllegalAccessException {
-        // Use reflection to inject the mocked logger into GymFacade
+        // Reflection to inject the mocked logger into GymFacade
         Field loggerField = GymFacade.class.getDeclaredField("logger");
         loggerField.setAccessible(true);
         loggerField.set(gymFacade, logger);
@@ -111,6 +115,33 @@ class GymFacadeTest {
         gymFacade.findTrainerByUsername("invalid");
 
         verify(trainerService).findByUsername("invalid");
+        verify(logger).error("Trainer not found");
+    }
+
+    // Training tests
+    @Test
+    void createTraining_ShouldCallServiceAndLogSuccess() {
+        gymFacade.createTraining("John.Doe", "Jane.Smith", TrainingType.YOGA, "morning yoga", "28-03-2025", "1 and a half hours");
+
+        verify(trainingService).create("John.Doe", "Jane.Smith", TrainingType.YOGA, "morning yoga", "28-03-2025", "1 and a half hours");
+        verify(logger).info("Trainer created successfully");
+    }
+
+    @Test
+    void findTrainingById_WhenExists_ShouldLogSuccess() {
+        gymFacade.findTrainingById("john.doe");
+
+        verify(trainingService).findById("john.doe");
+        verify(logger).info("Trainer found successfully");
+    }
+
+    @Test
+    void findTrainingById_WhenNotFound_ShouldLogError() {
+        doThrow(new IllegalArgumentException()).when(trainingService).findById("invalid");
+
+        gymFacade.findTrainingById("invalid");
+
+        verify(trainingService).findById("invalid");
         verify(logger).error("Trainer not found");
     }
 }

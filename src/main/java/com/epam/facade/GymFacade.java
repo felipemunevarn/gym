@@ -6,20 +6,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.epam.model.TrainingType;
 import com.epam.service.TraineeService;
 import com.epam.service.TrainerService;
+import com.epam.service.TrainingService;
 
 @Component
 public class GymFacade {
     private final TraineeService traineeService;
     private final TrainerService trainerService;
+    private final TrainingService trainingService;
     private Logger logger = LoggerFactory.getLogger(GymFacade.class);
 
     @Autowired
-    public GymFacade(TraineeService ts, TrainerService trs) {//, TrainingService tgs) {
+    public GymFacade(TraineeService ts, TrainerService trs, TrainingService tgs) {
         this.traineeService = ts;
         this.trainerService = trs;
-        // this.trainingService = tgs;
+        this.trainingService = tgs;
     }
 
     // public TraineeService getTraineeService() {
@@ -71,6 +74,21 @@ public class GymFacade {
             logger.info("Trainer found successfully");
         } catch (IllegalArgumentException e) {
             logger.error("Trainer not found");
+        }
+    }
+
+    // Training methods
+    public void createTraining(String traineeName, String trainerName, TrainingType trainingType, String name, String date, String duration) {
+        trainingService.create(traineeName, trainerName, trainingType, name, date, duration);
+        logger.info("Training created successfully");
+    }
+
+    public void findTrainingById(String id) {
+        try {
+            trainingService.findById(id);
+            logger.info("Training found successfully");
+        } catch (IllegalArgumentException e) {
+            logger.error("Training not found");
         }
     }
 }
