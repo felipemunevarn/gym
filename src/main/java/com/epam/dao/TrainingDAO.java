@@ -13,7 +13,7 @@ public class TrainingDAO {
     private final Map<String, Training> storage;
 
     @Autowired
-    public TrainingDAO(@Qualifier("traineeStorage") Map<String, Training> storage) {
+    public TrainingDAO(@Qualifier("trainingStorage") Map<String, Training> storage) {
         this.storage = storage;
     }
 

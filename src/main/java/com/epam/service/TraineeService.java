@@ -17,18 +17,27 @@ public class TraineeService {
     public Trainee create(String firstName, String lastName, String dateOfBirth, String address) {
         String username = generateUsername(firstName, lastName);
         String password = generatePassword();
-        Trainee trainee = new Trainee(username, firstName, lastName, password, dateOfBirth, address);
+        Trainee trainee = new Trainee.Builder()
+                .username(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .password(password)
+                .dateOfBirth(dateOfBirth)
+                .address(address)
+                .build();
+        ;
         traineeDAO.save(trainee);
         return trainee;
     }
-
+    
     public Optional<Trainee> update(String username, String dateOfBirth, String address) {
         if (!traineeDAO.exists(username)) {
             throw new IllegalArgumentException("Trainee with username " + username + " not found"); // condition is not defined
         }
         Trainee trainee = traineeDAO.findByUsername(username);
-        trainee.setDateOfBirth(dateOfBirth);
-        trainee.setAddress(address);
+        // trainee.setDateOfBirth(dateOfBirth);
+        // trainee.setAddress(address);
+        traineeDAO.save(trainee);
         return Optional.of(trainee);
     }
 

@@ -71,7 +71,14 @@ public class AppConfig {
             while ((line = reader.readLine()) != null) {
             String[] parts = line.split(",");
                 if (type == Trainee.class) {
-                    T entity = type.cast(new Trainee(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]));
+                    T entity = type.cast(new Trainee.Builder()
+                    .username(parts[0])
+                    .firstName(parts[1])
+                    .lastName(parts[2])
+                    .password(parts[3])
+                    .dateOfBirth(parts[4])
+                    .address(parts[5])
+                    .build());
                     storage.put(parts[0], entity);
                 } else if (type == Trainer.class) {
                     T entity = type.cast(new Trainer(parts[0], parts[1], parts[2], parts[3], parts[4]));
