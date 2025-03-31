@@ -5,12 +5,6 @@ public class Trainee {
     private final String dateOfBirth;
     private final String address;
 
-    // public Trainee(String username, String firstName, String lastName, String password, String dateOfBirth, String address) {
-    //     super(username, firstName, lastName, password);
-    //     this.dateOfBirth = dateOfBirth;
-    //     this.address = address;
-    // }
-
     private Trainee(Builder builder) {
         this.user = builder.user;
         this.dateOfBirth = builder.dateOfBirth;
@@ -63,13 +57,6 @@ public class Trainee {
             return new Trainee(this);
         }
     }
-
-    // public void setDateOfBirth(String dateOfBirth) {
-    //     this.dateOfBirth = dateOfBirth;
-    // }
-    // public void setAddress(String address) {
-    //     this.address = address;
-    // }
 
     @Override
     public String toString() {

@@ -17,17 +17,24 @@ public class TrainerService {
     public Trainer create(String firstName, String lastName, String specialization) {
         String username = generateUsername(firstName, lastName);
         String password = generatePassword();
-        Trainer trainer = new Trainer(username, firstName, lastName, password, specialization);
+        Trainer trainer = new Trainer.Builder()
+        .username(username)
+        .firstName(firstName)
+        .lastName(lastName)
+        .password(password)
+        .specialization(specialization)
+        .build();
         trainerDAO.save(trainer);
         return trainer;
     }
-
+    
     public Optional<Trainer> update(String username, String specialization) {
         if (!trainerDAO.exists(username)) {
             throw new IllegalArgumentException("Trainer with username " + username + " not found"); // condition is not defined
         }
         Trainer trainer = trainerDAO.findByUsername(username);
-        trainer.setSpecialization(specialization);
+        // trainer.setSpecialization(specialization);
+        trainerDAO.save(trainer);
         return Optional.of(trainer);
     }
 

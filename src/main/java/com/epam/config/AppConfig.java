@@ -81,7 +81,13 @@ public class AppConfig {
                     .build());
                     storage.put(parts[0], entity);
                 } else if (type == Trainer.class) {
-                    T entity = type.cast(new Trainer(parts[0], parts[1], parts[2], parts[3], parts[4]));
+                    T entity = type.cast(new Trainer.Builder()
+                    .username(parts[0])
+                    .firstName(parts[1])
+                    .lastName(parts[2])
+                    .password(parts[3])
+                    .specialization(parts[4])
+                    .build());
                     storage.put(parts[0], entity);
                 } else if (type == Training.class) {
                     T entity = type.cast(new Training(parts[1], parts[2], TrainingType.valueOf(parts[3]), parts[4], parts[5], parts[6]));
