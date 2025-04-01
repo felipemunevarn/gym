@@ -5,14 +5,15 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.epam.dao.TrainerDAO;
+import com.epam.dao.GenericDAO;
+// import com.epam.dao.TrainerDAO;
 import com.epam.model.Trainer;
 
 @Service
 public class TrainerService {
 
     @Autowired
-    private TrainerDAO trainerDAO;
+    private GenericDAO<Trainer, String> trainerDAO;
 
     public Trainer create(String firstName, String lastName, String specialization) {
         String username = generateUsername(firstName, lastName);

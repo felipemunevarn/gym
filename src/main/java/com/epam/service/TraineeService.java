@@ -26,7 +26,7 @@ public class TraineeService {
                 .dateOfBirth(dateOfBirth)
                 .address(address)
                 .build();
-        traineeDAO.create(trainee);
+        traineeDAO.save(trainee);
         return trainee;
     }
     
@@ -52,7 +52,7 @@ public class TraineeService {
         if (!traineeDAO.exists(username)) {
             throw new IllegalArgumentException("Trainee with username " + username + " not found");
         }
-        return Optional.of(traineeDAO.read(username));
+        return Optional.of(traineeDAO.findByUsername(username));
     }
 
     // auxiliar methods to generate username and password

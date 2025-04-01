@@ -14,14 +14,14 @@ public class InMemoryGenericDAO<T, ID> implements GenericDAO<T, ID> {
     }
 
     @Override
-    public void create(T entity) {
+    public void save(T entity) {
         // Assuming the entity has a method to get its ID
         ID id = getId(entity);
         storage.put(id, entity);
     }
 
     @Override
-    public T read(ID id) {
+    public T findByUsername(ID id) {
         return storage.get(id);
     }
 

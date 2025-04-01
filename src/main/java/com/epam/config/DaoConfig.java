@@ -19,8 +19,8 @@ public class DaoConfig {
         return new InMemoryGenericDAO<>(storage); // Injects traineeStorage
     }
 
-    // @Bean
-    // public GenericDAO<Trainer, String> trainerDAO(@Qualifier("trainerStorage") Map<String, Trainer> storage) {
-    //     return new InMemoryGenericDAO<>(storage); // Injects trainerStorage
-    // }
+    @Bean
+    public GenericDAO<Trainer, String> trainerDAO(@Qualifier("trainerStorage") Map<String, Trainer> storage) {
+        return new InMemoryGenericDAO<>(storage); // Injects trainerStorage
+    }
 }

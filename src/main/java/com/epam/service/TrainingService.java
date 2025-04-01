@@ -8,8 +8,9 @@ import org.springframework.stereotype.Service;
 import com.epam.dao.TrainingDAO;
 import com.epam.dao.GenericDAO;
 // import com.epam.dao.TraineeDAO;
-import com.epam.dao.TrainerDAO;
+// import com.epam.dao.TrainerDAO;
 import com.epam.model.Trainee;
+import com.epam.model.Trainer;
 import com.epam.model.Training;
 import com.epam.model.TrainingType;
 
@@ -21,7 +22,7 @@ public class TrainingService {
     @Autowired
     private GenericDAO<Trainee, String> traineeDAO;
     @Autowired
-    private TrainerDAO trainerDAO;
+    private GenericDAO<Trainer, String> trainerDAO;
 
     public Training create(String traineeName, String trainerName, TrainingType trainingType, String name, String date, String duration) {
         if (!traineeDAO.exists(traineeName)) {
