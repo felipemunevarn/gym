@@ -1,15 +1,23 @@
 package com.epam.model;
 
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class TraineeTest {
 
     @Test
-    void testTraineeConstructorAndGetters() {
-        Trainee trainee = new Trainee("john_doe", "John", "Doe", "password123", "1990-01-01", "123 Main St");
+    void testTraineeBuilderCreatesTraineeSuccessfully() {
+        Trainee trainee = new Trainee.Builder()
+                .username("trainee1")
+                .firstName("John")
+                .lastName("Doe")
+                .password("password123")
+                .dateOfBirth("1990-01-01")
+                .address("123 Main St")
+                .build();
 
-        assertEquals("john_doe", trainee.getUsername());
+        assertNotNull(trainee);
+        assertEquals("trainee1", trainee.getUsername());
         assertEquals("John", trainee.getFirstName());
         assertEquals("Doe", trainee.getLastName());
         assertEquals("password123", trainee.getPassword());
@@ -18,26 +26,42 @@ class TraineeTest {
     }
 
     @Test
-    void testSetDateOfBirth() {
-        Trainee trainee = new Trainee("john_doe", "John", "Doe", "password123", "1990-01-01", "123 Main St");
-        trainee.setDateOfBirth("2000-12-31");
+    void testGetIdReturnsUsername() {
+        Trainee trainee = new Trainee.Builder()
+                .username("trainee1")
+                .build();
 
-        assertEquals("2000-12-31", trainee.getDateOfBirth());
+        assertEquals("trainee1", trainee.getId());
     }
 
     @Test
-    void testSetAddress() {
-        Trainee trainee = new Trainee("john_doe", "John", "Doe", "password123", "1990-01-01", "123 Main St");
-        trainee.setAddress("456 Elm St");
+    void testToStringReturnsCorrectStringRepresentation() {
+        Trainee trainee = new Trainee.Builder()
+                .username("trainee1")
+                .firstName("John")
+                .lastName("Doe")
+                .password("password123")
+                .dateOfBirth("1990-01-01")
+                .address("123 Main St")
+                .build();
 
-        assertEquals("456 Elm St", trainee.getAddress());
-    }
-
-    @Test
-    void testToString() {
-        Trainee trainee = new Trainee("john_doe", "John", "Doe", "password123", "1990-01-01", "123 Main St");
-        String expected = "Trainee [username=john_doe, firstName=John, lastName=Doe, password=password123, dateOfBirth=1990-01-01, address=123 Main St]";
-
+        String expected = "Trainee [username=trainee1, firstName=John, lastName=Doe, password=password123, dateOfBirth=1990-01-01, address=123 Main St]";
         assertEquals(expected, trainee.toString());
+    }
+
+    @Test
+    void testBuilderAllowsPartialBuild() {
+        Trainee trainee = new Trainee.Builder()
+                .username("trainee1")
+                .firstName("John")
+                .build();
+
+        assertNotNull(trainee);
+        assertEquals("trainee1", trainee.getUsername());
+        assertEquals("John", trainee.getFirstName());
+        assertNull(trainee.getLastName());
+        assertNull(trainee.getPassword());
+        assertNull(trainee.getDateOfBirth());
+        assertNull(trainee.getAddress());
     }
 }

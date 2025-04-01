@@ -89,7 +89,7 @@ public class AppConfig {
                     .specialization(parts[4])
                     .build());
                     storage.put(parts[0], entity);
-                } else if (type == Training.class) {
+                } else {//(type == Training.class) {
                     T entity = type.cast(new Training.Builder()
                     .traineeName(parts[1])
                     .trainerName(parts[2])

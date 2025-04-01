@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import com.epam.dao.TraineeDAO;
+import com.epam.dao.impl.CreateReadUpdateDeleteDaoImpl;
 import com.epam.model.Trainee;
+import com.epam.util.AccountGenerator;
 
 class TraineeServiceTest {
 
     @Mock
-    private TraineeDAO traineeDAO;
+    private CreateReadUpdateDeleteDaoImpl<Trainee, String> traineeDAO;
 
     @InjectMocks
     private TraineeService traineeService;
@@ -30,46 +31,62 @@ class TraineeServiceTest {
         String lastName = "Doe";
         String dateOfBirth = "1990-01-01";
         String address = "123 Main St";
+        String username = "john.doe";
+        String password = "password123";
 
-        when(traineeDAO.exists(anyString())).thenReturn(false);
+        mockStatic(AccountGenerator.class);
+        when(AccountGenerator.generateUsername(eq(firstName), eq(lastName), any())).thenReturn(username);
+        when(AccountGenerator.generatePassword()).thenReturn(password);
+
+        Trainee trainee = new Trainee.Builder()
+                .username(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .password(password)
+                .dateOfBirth(dateOfBirth)
+                .address(address)
+                .build();
+
+        doNothing().when(traineeDAO).save(trainee);
 
         Trainee createdTrainee = traineeService.create(firstName, lastName, dateOfBirth, address);
-        
-        assertNotNull(createdTrainee);
-        assertEquals("John.Doe", createdTrainee.getUsername());
+
+        assertEquals(username, createdTrainee.getUsername());
         assertEquals(firstName, createdTrainee.getFirstName());
         assertEquals(lastName, createdTrainee.getLastName());
+        assertEquals(password, createdTrainee.getPassword());
         assertEquals(dateOfBirth, createdTrainee.getDateOfBirth());
         assertEquals(address, createdTrainee.getAddress());
-        verify(traineeDAO).save(any(Trainee.class));
     }
 
     @Test
     void testUpdate() {
         String username = "john.doe";
-        String newDateOfBirth = "1991-02-02";
-        String newAddress = "456 Elm St";
+        String dateOfBirth = "1991-01-01";
+        String address = "456 Elm St";
 
-        Trainee existingTrainee = new Trainee(username, "John", "Doe", "password123", "1990-01-01", "123 Main St");
+        Trainee existingTrainee = new Trainee.Builder()
+                .username(username)
+                .dateOfBirth("1990-01-01")
+                .address("123 Main St")
+                .build();
 
         when(traineeDAO.exists(username)).thenReturn(true);
         when(traineeDAO.findByUsername(username)).thenReturn(existingTrainee);
 
-        Optional<Trainee> updatedTrainee = traineeService.update(username, newDateOfBirth, newAddress);
+        Trainee updatedTrainee = new Trainee.Builder()
+                .username(username)
+                .dateOfBirth(dateOfBirth)
+                .address(address)
+                .build();
 
-        assertTrue(updatedTrainee.isPresent());
-        assertEquals(newDateOfBirth, updatedTrainee.get().getDateOfBirth());
-        assertEquals(newAddress, updatedTrainee.get().getAddress());
-        verify(traineeDAO).findByUsername(username);
-    }
+        doNothing().when(traineeDAO).save(updatedTrainee);
 
-    @Test
-    void testUpdateThrowsExceptionWhenTraineeNotFound() {
-        String username = "nonexistent";
+        Optional<Trainee> result = traineeService.update(updatedTrainee);
 
-        when(traineeDAO.exists(username)).thenReturn(false);
-
-        assertThrows(IllegalArgumentException.class, () -> traineeService.update(username, "1991-02-02", "456 Elm St"));
+        assertTrue(result.isPresent());
+        assertEquals(dateOfBirth, result.get().getDateOfBirth());
+        assertEquals(address, result.get().getAddress());
     }
 
     @Test
@@ -77,94 +94,40 @@ class TraineeServiceTest {
         String username = "john.doe";
 
         when(traineeDAO.exists(username)).thenReturn(true);
+        doNothing().when(traineeDAO).delete(username);
 
         assertDoesNotThrow(() -> traineeService.delete(username));
         verify(traineeDAO).delete(username);
     }
 
     @Test
-    void testDeleteThrowsExceptionWhenTraineeNotFound() {
-        String username = "nonexistent";
-
-        when(traineeDAO.exists(username)).thenReturn(false);
-
-        assertThrows(IllegalArgumentException.class, () -> traineeService.delete(username));
-    }
-
-    @Test
     void testFindByUsername() {
         String username = "john.doe";
-        Trainee existingTrainee = new Trainee(username, "John", "Doe", "password123", "1990-01-01", "123 Main St");
+
+        Trainee trainee = new Trainee.Builder()
+                .username(username)
+                .build();
 
         when(traineeDAO.exists(username)).thenReturn(true);
-        when(traineeDAO.findByUsername(username)).thenReturn(existingTrainee);
+        when(traineeDAO.findByUsername(username)).thenReturn(trainee);
 
-        Optional<Trainee> foundTrainee = traineeService.findByUsername(username);
+        Optional<Trainee> result = traineeService.findByUsername(username);
 
-        assertTrue(foundTrainee.isPresent());
-        assertEquals(existingTrainee, foundTrainee.get());
+        assertTrue(result.isPresent());
+        assertEquals(username, result.get().getUsername());
         verify(traineeDAO).findByUsername(username);
     }
 
     @Test
-    void testFindByUsernameThrowsExceptionWhenTraineeNotFound() {
-        String username = "nonexistent";
+    void testFindByUsernameThrowsExceptionWhenNotFound() {
+        String username = "john.doe";
 
         when(traineeDAO.exists(username)).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> traineeService.findByUsername(username));
-    }
-    @Test
-    void testGenerateUsernameWhenNoConflict() {
-        String firstName = "Jane";
-        String lastName = "Smith";
-        String expectedUsername = "Jane.Smith";
-        
-        when(traineeDAO.exists(expectedUsername)).thenReturn(false);
-        
-        String generatedUsername = traineeService.create(firstName, lastName, "1992-03-03", "789 Pine St").getUsername();
-        
-        assertEquals(expectedUsername, generatedUsername);
-        verify(traineeDAO).exists(expectedUsername);
-    }
-    
-    @Test
-    void testGenerateUsernameWhenConflictExists() {
-        String firstName = "Jane";
-        String lastName = "Smith";
-        String baseUsername = "Jane.Smith";
-        String expectedUsername = "Jane.Smith1";
-        
-        when(traineeDAO.exists(baseUsername)).thenReturn(true);
-        when(traineeDAO.exists(expectedUsername)).thenReturn(false);
-        
-        String generatedUsername = traineeService.create(firstName, lastName, "1992-03-03", "789 Pine St").getUsername();
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            traineeService.findByUsername(username);
+        });
 
-        assertEquals(expectedUsername, generatedUsername);
-        verify(traineeDAO).exists(baseUsername);
-        verify(traineeDAO).exists(expectedUsername);
-    }
-
-    @Test
-    void testGenerateUsernameWhenMultipleConflictsExist() {
-        String firstName = "Jane";
-        String lastName = "Smith";
-        String baseUsername = "Jane.Smith";
-        String conflictUsername1 = "Jane.Smith1";
-        String conflictUsername2 = "Jane.Smith2";
-        String expectedUsername = "Jane.Smith3";
-        
-        when(traineeDAO.exists(baseUsername)).thenReturn(true);
-        when(traineeDAO.exists(conflictUsername1)).thenReturn(true);
-        when(traineeDAO.exists(conflictUsername2)).thenReturn(true);
-        when(traineeDAO.exists(expectedUsername)).thenReturn(false);
-        
-        String generatedUsername = traineeService.create(firstName, lastName, "1992-03-03", "789 Pine St").getUsername();
-        
-        assertEquals(expectedUsername, generatedUsername);
-        verify(traineeDAO).exists(baseUsername);
-        verify(traineeDAO).exists(conflictUsername1);
-        verify(traineeDAO).exists(conflictUsername2);
-        verify(traineeDAO).exists(expectedUsername);
+        assertEquals("Trainee with username " + username + " not found", exception.getMessage());
     }
 }

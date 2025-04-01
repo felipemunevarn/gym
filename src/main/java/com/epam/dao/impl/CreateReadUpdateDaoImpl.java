@@ -13,7 +13,12 @@ public class CreateReadUpdateDaoImpl<T, ID> extends CreateReadDaoImpl<T, ID> imp
 
     @Override
     public void update(T entity) {
-        ID id = ((Identifiable<ID>) entity).getId(); // Replace with actual method to get ID from entity
-        super.storage.put(id, entity);
+        ID id = ((Identifiable<ID>) entity).getId();
+
+        if (!storage.containsKey(id)) {
+            throw new IllegalArgumentException ("Entity with ID " + id + " does not exist.");
+        }
+    
+        storage.put(id, entity);
     }
 }

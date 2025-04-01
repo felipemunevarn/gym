@@ -16,7 +16,6 @@ public class CreateReadDaoImpl<T, ID> implements GenericDAO<T, ID>, CreateDAO<T,
     
     @Override
     public void save(T entity) {
-        // Assuming the entity has a method to get its ID
         ID id = ((Identifiable<ID>) entity).getId(); // Replace with actual method to get ID from entity
         storage.put(id, entity);
     }
@@ -28,7 +27,6 @@ public class CreateReadDaoImpl<T, ID> implements GenericDAO<T, ID>, CreateDAO<T,
 
     @Override
     public Boolean exists(ID id) {
-        // TODO Auto-generated method stub
         return storage.containsKey(id);
     }
 }

@@ -1,36 +1,48 @@
 package com.epam.facade;
 
-import com.epam.model.TrainingType;
-import com.epam.service.TraineeService;
-import com.epam.service.TrainerService;
-import com.epam.service.TrainingService;
+import static org.mockito.Mockito.*;
 
+import java.lang.reflect.Field;
+import java.util.Optional;
+
+// import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
-import static org.mockito.Mockito.*;
 
-import java.lang.reflect.Field;
+import com.epam.model.Trainee;
+import com.epam.model.TrainingType;
+import com.epam.service.TraineeService;
+import com.epam.service.TrainerService;
+import com.epam.service.TrainingService;
 
 @ExtendWith(MockitoExtension.class)
 class GymFacadeTest {
 
     @Mock
     private TraineeService traineeService;
+
     @Mock
     private TrainerService trainerService;
+
     @Mock
     private TrainingService trainingService;
 
     @Mock
-    private Logger logger; // Mock the logger
+    private Logger logger;
 
     @InjectMocks
     private GymFacade gymFacade;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @BeforeEach
     void injectMockLogger() throws NoSuchFieldException, IllegalAccessException {
@@ -40,108 +52,165 @@ class GymFacadeTest {
         loggerField.set(gymFacade, logger);
     }
 
-    // Trainee tests    
     @Test
-    void createTrainee_ShouldCallServiceAndLogSuccess() {
-        gymFacade.createTrainee("John", "Doe", "2000-01-01", "john@example.com");
+    void testCreateTrainee() {
+        String firstName = "John";
+        String lastName = "Doe";
+        String dateOfBirth = "1990-01-01";
+        String address = "123 Main St";
 
-        verify(traineeService).create("John", "Doe", "2000-01-01", "john@example.com");
+        gymFacade.createTrainee(firstName, lastName, dateOfBirth, address);
+
+        verify(traineeService).create(firstName, lastName, dateOfBirth, address);
         verify(logger).info("Trainee created successfully");
     }
 
     @Test
-    void updateTrainee_ShouldCallServiceAndLogSuccess() {
-        gymFacade.updateTrainee("john.doe", "2000-01-01", "123 Main St");
+    void testUpdateTrainee() {
+        String firstName = "John";
+        String lastName = "Doe";
+        String dateOfBirth = "1990-01-01";
+        String address = "123 Main St";
 
-        verify(traineeService).update("john.doe", "2000-01-01", "123 Main St");
+        gymFacade.createTrainee(firstName, lastName, dateOfBirth, address);
+
+        Trainee trainee = new Trainee.Builder()
+                .username("John.Doe")
+                .firstName(firstName)
+                .lastName(lastName)
+                .dateOfBirth("1990-01-01")
+                .address("456 Elm St")
+                .build();
+
+        when(traineeService.update(trainee)).thenReturn(Optional.of(trainee));
+
+        // String username = "john.doe";
+        // String dateOfBirth = "1990-01-01";
+        // String address = "456 Elm St";
+
+        gymFacade.updateTrainee(trainee);
+
+        verify(traineeService).update(trainee);
         verify(logger).info("Trainee updated successfully");
     }
 
     @Test
-    void deleteTrainee_ShouldCallServiceAndLogSuccess() {
-        gymFacade.deleteTrainee("john.doe");
+    void testDeleteTrainee() {
+        String username = "john.doe";
 
-        verify(traineeService).delete("john.doe");
+        gymFacade.deleteTrainee(username);
+
+        verify(traineeService).delete(username);
         verify(logger).info("Trainee deleted successfully");
     }
 
     @Test
-    void findTraineeByUsername_WhenExists_ShouldLogSuccess() {
-        gymFacade.findTraineeByUsername("john.doe");
+    void testFindTraineeByUsername() {
+        String username = "john.doe";
 
-        verify(traineeService).findByUsername("john.doe");
-        verify(logger).info("Trainee found successfully");
+        doNothing().when(traineeService).findByUsername(username);
+
+        gymFacade.findTraineeByUsername(username);
+
+        verify(traineeService).findByUsername(username);
+        verify(logger).info("Trainee: " + username + " found successfully");
     }
 
     @Test
-    void findTraineeByUsername_WhenNotFound_ShouldLogError() {
-        doThrow(new IllegalArgumentException()).when(traineeService).findByUsername("invalid");
+    void testFindTraineeByUsernameNotFound() {
+        String username = "john.doe";
 
-        gymFacade.findTraineeByUsername("invalid");
+        doThrow(new IllegalArgumentException("Trainee not found")).when(traineeService).findByUsername(username);
 
-        verify(traineeService).findByUsername("invalid");
-        verify(logger).error("Trainee not found");
+        gymFacade.findTraineeByUsername(username);
+
+        verify(traineeService).findByUsername(username);
+        verify(logger).error("Trainee: " + username + " not found");
     }
 
-    // Trainer tests
     @Test
-    void createTrainer_ShouldCallServiceAndLogSuccess() {
-        gymFacade.createTrainer("John", "Doe", "stretching");
+    void testCreateTrainer() {
+        String firstName = "Jane";
+        String lastName = "Smith";
+        String specialization = "Yoga";
 
-        verify(trainerService).create("John", "Doe", "stretching");
+        gymFacade.createTrainer(firstName, lastName, specialization);
+
+        verify(trainerService).create(firstName, lastName, specialization);
         verify(logger).info("Trainer created successfully");
     }
 
     @Test
-    void updateTrainer_ShouldCallServiceAndLogSuccess() {
-        gymFacade.updateTrainer("john.doe", "stretching");
+    void testUpdateTrainer() {
+        String username = "jane.smith";
+        String specialization = "Pilates";
 
-        verify(trainerService).update("john.doe", "stretching");
-        verify(logger).info("Trainer updated successfully");
+        gymFacade.updateTrainer(username, specialization);
+
+        verify(trainerService).update(username, specialization);
+        verify(logger).info("Trainer: " + username + " updated successfully");
     }
 
     @Test
-    void findTrainerByUsername_WhenExists_ShouldLogSuccess() {
-        gymFacade.findTrainerByUsername("john.doe");
+    void testFindTrainerByUsername() {
+        String username = "jane.smith";
 
-        verify(trainerService).findByUsername("john.doe");
-        verify(logger).info("Trainer found successfully");
+        doNothing().when(trainerService).findByUsername(username);
+
+        gymFacade.findTrainerByUsername(username);
+
+        verify(trainerService).findByUsername(username);
+        verify(logger).info("Trainer: " + username + " found successfully");
     }
 
     @Test
-    void findTrainerByUsername_WhenNotFound_ShouldLogError() {
-        doThrow(new IllegalArgumentException()).when(trainerService).findByUsername("invalid");
+    void testFindTrainerByUsernameNotFound() {
+        String username = "jane.smith";
 
-        gymFacade.findTrainerByUsername("invalid");
+        doThrow(new IllegalArgumentException("Trainer not found")).when(trainerService).findByUsername(username);
 
-        verify(trainerService).findByUsername("invalid");
-        verify(logger).error("Trainer not found");
-    }
+        gymFacade.findTrainerByUsername(username);
 
-    // Training tests
-    @Test
-    void createTraining_ShouldCallServiceAndLogSuccess() {
-        gymFacade.createTraining("John.Doe", "Jane.Smith", TrainingType.YOGA, "morning yoga", "28-03-2025", "1 and a half hours");
-
-        verify(trainingService).create("John.Doe", "Jane.Smith", TrainingType.YOGA, "morning yoga", "28-03-2025", "1 and a half hours");
-        verify(logger).info("Trainer created successfully");
+        verify(trainerService).findByUsername(username);
+        verify(logger).error("Trainer: " + username + " not found");
     }
 
     @Test
-    void findTrainingById_WhenExists_ShouldLogSuccess() {
-        gymFacade.findTrainingById("john.doe");
+    void testCreateTraining() {
+        String traineeName = "John Doe";
+        String trainerName = "Jane Smith";
+        TrainingType trainingType = TrainingType.YOGA;
+        String name = "Morning Yoga";
+        String date = "2023-10-01";
+        String duration = "1h";
 
-        verify(trainingService).findById("john.doe");
-        verify(logger).info("Trainer found successfully");
+        gymFacade.createTraining(traineeName, trainerName, trainingType, name, date, duration);
+
+        verify(trainingService).create(traineeName, trainerName, trainingType, name, date, duration);
+        verify(logger).info("Training created successfully");
     }
 
     @Test
-    void findTrainingById_WhenNotFound_ShouldLogError() {
-        doThrow(new IllegalArgumentException()).when(trainingService).findById("invalid");
+    void testFindTrainingById() {
+        String id = "training123";
 
-        gymFacade.findTrainingById("invalid");
+        doNothing().when(trainingService).findById(id);
 
-        verify(trainingService).findById("invalid");
-        verify(logger).error("Trainer not found");
+        gymFacade.findTrainingById(id);
+
+        verify(trainingService).findById(id);
+        verify(logger).info("Training: " + id + " found successfully");
+    }
+
+    @Test
+    void testFindTrainingByIdNotFound() {
+        String id = "training123";
+
+        doThrow(new IllegalArgumentException("Training not found")).when(trainingService).findById(id);
+
+        gymFacade.findTrainingById(id);
+
+        verify(trainingService).findById(id);
+        verify(logger).error("Training: " + id + " not found");
     }
 }

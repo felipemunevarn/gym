@@ -34,15 +34,22 @@ public class TraineeService {
         return trainee;
     }
     
-    public Optional<Trainee> update(String username, String dateOfBirth, String address) {
+    public Optional<Trainee> update(Trainee newTrainee) {
+        String username = newTrainee.getUsername();
         if (!traineeDAO.exists(username)) {
             throw new IllegalArgumentException("Trainee with username " + username + " not found"); // condition is not defined
         }
-        Trainee trainee = traineeDAO.findByUsername(username);
-        // trainee.setDateOfBirth(dateOfBirth);
-        // trainee.setAddress(address);
-        traineeDAO.save(trainee);
-        return Optional.of(trainee);
+        // Trainee trainee = traineeDAO.findByUsername(username);
+        // Trainee newTrainee = new Trainee.Builder()
+        //         .username(trainee.getUsername())
+        //         .firstName(trainee.getFirstName())
+        //         .lastName(trainee.getLastName())
+        //         .password(trainee.getPassword())
+        //         .dateOfBirth(dateOfBirth)
+        //         .address(address)
+        //         .build();
+        traineeDAO.save(newTrainee);
+        return Optional.of(newTrainee);
     }
 
     public void delete(String username) throws IllegalArgumentException {

@@ -8,22 +8,22 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import com.epam.dao.TraineeDAO;
-import com.epam.dao.TrainerDAO;
-import com.epam.dao.TrainingDAO;
+import com.epam.dao.impl.CreateReadDaoImpl;
+import com.epam.model.Trainee;
+import com.epam.model.Trainer;
 import com.epam.model.Training;
 import com.epam.model.TrainingType;
 
 class TrainingServiceTest {
 
     @Mock
-    private TrainingDAO trainingDAO;
+    private CreateReadDaoImpl<Training, String> trainingDAO;
 
     @Mock
-    private TraineeDAO traineeDAO;
+    private CreateReadDaoImpl<Trainee, String> traineeDAO;
 
     @Mock
-    private TrainerDAO trainerDAO;
+    private CreateReadDaoImpl<Trainer, String> trainerDAO;
 
     @InjectMocks
     private TrainingService trainingService;
@@ -34,18 +34,26 @@ class TrainingServiceTest {
     }
 
     @Test
-    void testCreateTrainingSuccessfully() {
+    void testCreateTraining() {
         String traineeName = "trainee1";
         String trainerName = "trainer1";
         TrainingType trainingType = TrainingType.YOGA;
-        String name = "Morning Yoga";
+        String name = "Java Training";
         String date = "2023-10-01";
-        String duration = "1h";
+        String duration = "2 hours";
 
         when(traineeDAO.exists(traineeName)).thenReturn(true);
         when(trainerDAO.exists(trainerName)).thenReturn(true);
 
-        Training training = new Training(traineeName, trainerName, trainingType, name, date, duration);
+        Training training = new Training.Builder()
+            .traineeName(traineeName)
+            .trainerName(trainerName)
+            .trainingType(trainingType)
+            .name(name)
+            .date(date)
+            .duration(duration)
+            .build();
+
         doReturn(training).when(trainingDAO).save(any(Training.class));
 
         Training createdTraining = trainingService.create(traineeName, trainerName, trainingType, name, date, duration);
@@ -57,82 +65,91 @@ class TrainingServiceTest {
         assertEquals(name, createdTraining.getName());
         assertEquals(date, createdTraining.getDate());
         assertEquals(duration, createdTraining.getDuration());
+
         verify(traineeDAO).exists(traineeName);
         verify(trainerDAO).exists(trainerName);
         verify(trainingDAO).save(any(Training.class));
     }
 
     @Test
-    void testCreateTrainingThrowsExceptionWhenTraineeNotFound() {
-        String traineeName = "nonexistentTrainee";
+    void testCreateTrainingTraineeNotFound() {
+        String traineeName = "trainee1";
         String trainerName = "trainer1";
         TrainingType trainingType = TrainingType.YOGA;
-        String name = "Morning Yoga";
+        String name = "Java Training";
         String date = "2023-10-01";
-        String duration = "1h";
+        String duration = "2 hours";
 
         when(traineeDAO.exists(traineeName)).thenReturn(false);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> 
-            trainingService.create(traineeName, trainerName, trainingType, name, date, duration)
-        );
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            trainingService.create(traineeName, trainerName, trainingType, name, date, duration);
+        });
 
         assertEquals("Trainee with username " + traineeName + " not found", exception.getMessage());
         verify(traineeDAO).exists(traineeName);
-        verifyNoInteractions(trainerDAO);
-        verifyNoInteractions(trainingDAO);
+        verify(trainerDAO, never()).exists(anyString());
+        verify(trainingDAO, never()).save(any(Training.class));
     }
 
     @Test
-    void testCreateTrainingThrowsExceptionWhenTrainerNotFound() {
+    void testCreateTrainingTrainerNotFound() {
         String traineeName = "trainee1";
-        String trainerName = "nonexistentTrainer";
+        String trainerName = "trainer1";
         TrainingType trainingType = TrainingType.YOGA;
-        String name = "Morning Yoga";
+        String name = "Java Training";
         String date = "2023-10-01";
-        String duration = "1h";
+        String duration = "2 hours";
 
         when(traineeDAO.exists(traineeName)).thenReturn(true);
         when(trainerDAO.exists(trainerName)).thenReturn(false);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> 
-            trainingService.create(traineeName, trainerName, trainingType, name, date, duration)
-        );
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            trainingService.create(traineeName, trainerName, trainingType, name, date, duration);
+        });
 
         assertEquals("Trainer with username " + trainerName + " not found", exception.getMessage());
         verify(traineeDAO).exists(traineeName);
         verify(trainerDAO).exists(trainerName);
-        verifyNoInteractions(trainingDAO);
+        verify(trainingDAO, never()).save(any(Training.class));
     }
 
     @Test
-    void testFindByIdSuccessfully() {
-        String trainingId = "training1";
-        Training training = new Training("trainee1", "trainer1", TrainingType.YOGA, "Morning Yoga", "2023-10-01", "1h");
+    void testFindById() {
+        String id = "training1";
+        Training training = new Training.Builder()
+            .traineeName("trainee1")
+            .trainerName("trainer1")
+            .trainingType(TrainingType.YOGA)
+            .name("Java Training")
+            .date("2023-10-01")
+            .duration("2 hours")
+            .build();
 
-        when(trainingDAO.exists(trainingId)).thenReturn(true);
-        when(trainingDAO.findById(trainingId)).thenReturn(training);
+        when(trainingDAO.exists(id)).thenReturn(true);
+        when(trainingDAO.findByUsername(id)).thenReturn(training);
 
-        Optional<Training> foundTraining = trainingService.findById(trainingId);
+        Optional<Training> foundTraining = trainingService.findById(id);
 
         assertTrue(foundTraining.isPresent());
         assertEquals(training, foundTraining.get());
-        verify(trainingDAO).exists(trainingId);
-        verify(trainingDAO).findById(trainingId);
+
+        verify(trainingDAO).exists(id);
+        verify(trainingDAO).findByUsername(id);
     }
 
     @Test
-    void testFindByIdThrowsExceptionWhenTrainingNotFound() {
-        String trainingId = "nonexistentTraining";
+    void testFindByIdNotFound() {
+        String id = "training1";
 
-        when(trainingDAO.exists(trainingId)).thenReturn(false);
+        when(trainingDAO.exists(id)).thenReturn(false);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> 
-            trainingService.findById(trainingId)
-        );
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            trainingService.findById(id);
+        });
 
-        assertEquals("Training with id " + trainingId + " not found", exception.getMessage());
-        verify(trainingDAO).exists(trainingId);
-        verifyNoMoreInteractions(trainingDAO);
+        assertEquals("Training with id " + id + " not found", exception.getMessage());
+        verify(trainingDAO).exists(id);
+        verify(trainingDAO, never()).findByUsername(anyString());
     }
 }

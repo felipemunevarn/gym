@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.epam.model.Trainee;
 import com.epam.model.TrainingType;
 import com.epam.service.TraineeService;
 import com.epam.service.TrainerService;
@@ -24,23 +25,16 @@ public class GymFacade {
         this.trainingService = tgs;
     }
 
-    // public TraineeService getTraineeService() {
-    //     return traineeService;
-    // }
-    // public TrainerService getTrainerService() {
-    //     return trainerService;
-    // }
-
     // Trainee methods    
     public void createTrainee(String firstName, String lastName, String dateOfBirth, String address) {
         traineeService.create(firstName, lastName, dateOfBirth, address);
         logger.info("Trainee created successfully");
     }
 
-    // public void updateTrainee(String username, String dateOfBirth, String address) {
-    //     traineeService.update(username, dateOfBirth, address);
-    //     logger.info("Trainee updated successfully");
-    // }
+    public void updateTrainee(Trainee newTrainee) {
+        traineeService.update(newTrainee);
+        logger.info("Trainee updated successfully");
+    }
     
     public void deleteTrainee(String username) {
         traineeService.delete(username);
