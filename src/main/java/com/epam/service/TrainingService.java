@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.epam.dao.TrainingDAO;
-import com.epam.dao.TraineeDAO;
+import com.epam.dao.GenericDAO;
+// import com.epam.dao.TraineeDAO;
 import com.epam.dao.TrainerDAO;
+import com.epam.model.Trainee;
 import com.epam.model.Training;
 import com.epam.model.TrainingType;
 
@@ -17,7 +19,7 @@ public class TrainingService {
     @Autowired
     private TrainingDAO trainingDAO;
     @Autowired
-    private TraineeDAO traineeDAO;
+    private GenericDAO<Trainee, String> traineeDAO;
     @Autowired
     private TrainerDAO trainerDAO;
 

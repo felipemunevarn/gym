@@ -5,14 +5,15 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.epam.dao.TraineeDAO;
+import com.epam.dao.GenericDAO;
+// import com.epam.dao.TraineeDAO;
 import com.epam.model.Trainee;
 
 @Service
 public class TraineeService {
 
     @Autowired
-    private TraineeDAO traineeDAO;
+    private GenericDAO<Trainee, String> traineeDAO;
 
     public Trainee create(String firstName, String lastName, String dateOfBirth, String address) {
         String username = generateUsername(firstName, lastName);
@@ -25,21 +26,20 @@ public class TraineeService {
                 .dateOfBirth(dateOfBirth)
                 .address(address)
                 .build();
-        ;
-        traineeDAO.save(trainee);
+        traineeDAO.create(trainee);
         return trainee;
     }
     
-    public Optional<Trainee> update(String username, String dateOfBirth, String address) {
-        if (!traineeDAO.exists(username)) {
-            throw new IllegalArgumentException("Trainee with username " + username + " not found"); // condition is not defined
-        }
-        Trainee trainee = traineeDAO.findByUsername(username);
-        // trainee.setDateOfBirth(dateOfBirth);
-        // trainee.setAddress(address);
-        traineeDAO.save(trainee);
-        return Optional.of(trainee);
-    }
+    // public Optional<Trainee> update(String username, String dateOfBirth, String address) {
+    //     if (!traineeDAO.exists(username)) {
+    //         throw new IllegalArgumentException("Trainee with username " + username + " not found"); // condition is not defined
+    //     }
+    //     Trainee trainee = traineeDAO.read(username);
+    //     // trainee.setDateOfBirth(dateOfBirth);
+    //     // trainee.setAddress(address);
+    //     traineeDAO.save(trainee);
+    //     return Optional.of(trainee);
+    // }
 
     public void delete(String username) throws IllegalArgumentException {
         if (!traineeDAO.exists(username)) {
@@ -52,7 +52,7 @@ public class TraineeService {
         if (!traineeDAO.exists(username)) {
             throw new IllegalArgumentException("Trainee with username " + username + " not found");
         }
-        return Optional.of(traineeDAO.findByUsername(username));
+        return Optional.of(traineeDAO.read(username));
     }
 
     // auxiliar methods to generate username and password

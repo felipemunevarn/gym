@@ -1,9 +1,14 @@
 package com.epam.model;
 
-public class Trainee {
+public class Trainee implements Identifiable<String> {
     private final User user;
     private final String dateOfBirth;
     private final String address;
+
+    @Override
+    public String getId() {
+        return user.getUsername();
+    }
 
     private Trainee(Builder builder) {
         this.user = builder.user;
