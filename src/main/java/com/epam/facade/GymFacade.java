@@ -42,10 +42,10 @@ public class GymFacade {
     //     logger.info("Trainee updated successfully");
     // }
     
-    // public void deleteTrainee(String username) {
-    //     traineeService.delete(username);
-    //     logger.info("Trainee deleted successfully");
-    // }
+    public void deleteTrainee(String username) {
+        traineeService.delete(username);
+        logger.info("Trainee deleted successfully");
+    }
 
     public void findTraineeByUsername(String username) {
         try {

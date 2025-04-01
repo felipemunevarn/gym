@@ -90,7 +90,14 @@ public class AppConfig {
                     .build());
                     storage.put(parts[0], entity);
                 } else if (type == Training.class) {
-                    T entity = type.cast(new Training(parts[1], parts[2], TrainingType.valueOf(parts[3]), parts[4], parts[5], parts[6]));
+                    T entity = type.cast(new Training.Builder()
+                    .traineeName(parts[1])
+                    .trainerName(parts[2])
+                    .trainingType(TrainingType.valueOf(parts[3]))
+                    .name(parts[4])
+                    .date(parts[5])
+                    .duration(parts[6])
+                    .build());
                     storage.put(parts[0], entity);
                 }
             }

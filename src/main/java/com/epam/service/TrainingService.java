@@ -28,7 +28,14 @@ public class TrainingService {
         if (!trainerDAO.exists(trainerName)) {
             throw new IllegalArgumentException("Trainer with username " + trainerName + " not found"); // condition is not defined
         }
-        Training training = new Training(traineeName, trainerName, trainingType, name, date, duration);
+        Training training = new Training.Builder()
+        .traineeName(traineeName)
+        .trainerName(trainerName)
+        .trainingType(trainingType)
+        .name(name)
+        .date(date)
+        .duration(duration)
+        .build();
         trainingDAO.save(training);
         return training;
     }
