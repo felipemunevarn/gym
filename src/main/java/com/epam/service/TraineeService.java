@@ -5,20 +5,23 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.epam.dao.impl.CreateReadDaoImpl;
-// import com.epam.dao.GenericDAO;
-// import com.epam.dao.TraineeDAO;
+import com.epam.dao.impl.CreateReadUpdateDeleteDaoImpl;
 import com.epam.model.Trainee;
+import com.epam.util.AccountGenerator;
 
 @Service
 public class TraineeService {
 
     @Autowired
-    private CreateReadDaoImpl<Trainee, String> traineeDAO;
+    private CreateReadUpdateDeleteDaoImpl<Trainee, String> traineeDAO;
 
     public Trainee create(String firstName, String lastName, String dateOfBirth, String address) {
-        String username = generateUsername(firstName, lastName);
-        String password = generatePassword();
+        String username = AccountGenerator.generateUsername(
+            firstName, 
+            lastName, 
+            traineeDAO::exists
+        );
+        String password = AccountGenerator.generatePassword();
         Trainee trainee = new Trainee.Builder()
                 .username(username)
                 .firstName(firstName)
@@ -31,44 +34,28 @@ public class TraineeService {
         return trainee;
     }
     
-    // public Optional<Trainee> update(String username, String dateOfBirth, String address) {
-    //     if (!traineeDAO.exists(username)) {
-    //         throw new IllegalArgumentException("Trainee with username " + username + " not found"); // condition is not defined
-    //     }
-    //     Trainee trainee = traineeDAO.read(username);
-    //     // trainee.setDateOfBirth(dateOfBirth);
-    //     // trainee.setAddress(address);
-    //     traineeDAO.save(trainee);
-    //     return Optional.of(trainee);
-    // }
+    public Optional<Trainee> update(String username, String dateOfBirth, String address) {
+        if (!traineeDAO.exists(username)) {
+            throw new IllegalArgumentException("Trainee with username " + username + " not found"); // condition is not defined
+        }
+        Trainee trainee = traineeDAO.findByUsername(username);
+        // trainee.setDateOfBirth(dateOfBirth);
+        // trainee.setAddress(address);
+        traineeDAO.save(trainee);
+        return Optional.of(trainee);
+    }
 
-    // public void delete(String username) throws IllegalArgumentException {
-    //     if (!traineeDAO.exists(username)) {
-    //         throw new IllegalArgumentException("Trainee with username " + username + " not found"); // condition is not defined
-    //     }
-    //     traineeDAO.delete(username);
-    // }
+    public void delete(String username) throws IllegalArgumentException {
+        if (!traineeDAO.exists(username)) {
+            throw new IllegalArgumentException("Trainee with username " + username + " not found"); // condition is not defined
+        }
+        traineeDAO.delete(username);
+    }
 
     public Optional<Trainee> findByUsername(String username) throws IllegalArgumentException {
         if (!traineeDAO.exists(username)) {
             throw new IllegalArgumentException("Trainee with username " + username + " not found");
         }
         return Optional.of(traineeDAO.findByUsername(username));
-    }
-
-    // auxiliar methods to generate username and password
-    private String generateUsername(String firstName, String lastName) {
-        String base = firstName + "." + lastName;
-        String username = base;
-        int suffix = 1;
-        while (traineeDAO.exists(username)) {
-            username = base + suffix;
-            suffix++;
-        }
-        return suffix > 1 ? username : base;
-    }
-
-    private String generatePassword() {
-        return java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 10);
     }
 }

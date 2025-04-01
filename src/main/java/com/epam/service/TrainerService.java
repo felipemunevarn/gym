@@ -5,20 +5,23 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.epam.dao.GenericDAO;
-import com.epam.dao.impl.CreateReadDaoImpl;
-// import com.epam.dao.TrainerDAO;
+import com.epam.dao.impl.CreateReadUpdateDaoImpl;
 import com.epam.model.Trainer;
+import com.epam.util.AccountGenerator;
 
 @Service
 public class TrainerService {
 
     @Autowired
-    private CreateReadDaoImpl<Trainer, String> trainerDAO;
+    private CreateReadUpdateDaoImpl<Trainer, String> trainerDAO;
 
     public Trainer create(String firstName, String lastName, String specialization) {
-        String username = generateUsername(firstName, lastName);
-        String password = generatePassword();
+        String username = AccountGenerator.generateUsername(
+            firstName, 
+            lastName, 
+            trainerDAO::exists
+        );
+        String password = AccountGenerator.generatePassword();
         Trainer trainer = new Trainer.Builder()
         .username(username)
         .firstName(firstName)
@@ -45,20 +48,5 @@ public class TrainerService {
             throw new IllegalArgumentException("Trainer with username " + username + " not found");
         }
         return Optional.of(trainerDAO.findByUsername(username));
-    }
-
-    private String generateUsername(String firstName, String lastName) {
-        String base = firstName + "." + lastName;
-        String username = base;
-        int suffix = 1;
-        while (trainerDAO.exists(username)) {
-            username = base + suffix;
-            suffix++;
-        }
-        return suffix > 1 ? username : base;
-    }
-
-    private String generatePassword() {
-        return java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 10);
     }
 }

@@ -2,7 +2,7 @@ package com.epam.model;
 
 import java.util.UUID;
 
-public class Training {
+public class Training implements Identifiable<String> {
     private String id;
     private String traineeName;
     private String trainerName;
@@ -10,6 +10,11 @@ public class Training {
     private String name;
     private String date;
     private String duration;
+
+    @Override
+    public String getId() {
+        return id;
+    }
 
     public Training(String traineeName, String trainerName, TrainingType trainingType, String name, String date, String duration) {
         this.id = UUID.randomUUID().toString();
@@ -20,9 +25,9 @@ public class Training {
         this.date = date;
         this.duration = duration;
     }
-    public String getId() {
-        return id;
-    }
+    // public String getId() {
+    //     return id;
+    // }
     // public void setId(String id) {
     //     this.id = id;
     // }

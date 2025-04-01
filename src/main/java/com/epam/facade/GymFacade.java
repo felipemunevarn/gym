@@ -50,9 +50,9 @@ public class GymFacade {
     public void findTraineeByUsername(String username) {
         try {
             traineeService.findByUsername(username);
-            logger.info("Trainee found successfully");
+            logger.info("Trainee: " + username  + " found successfully");
         } catch (IllegalArgumentException e) {
-            logger.error("Trainee not found");
+            logger.error("Trainee: " + username  + " not found");
         }
     }
 
@@ -64,15 +64,15 @@ public class GymFacade {
 
     public void updateTrainer(String username, String specialization) {
         trainerService.update(username, specialization);
-        logger.info("Trainer updated successfully");
+        logger.info("Trainer: " + username  + " updated successfully");
     }
 
     public void findTrainerByUsername(String username) {
         try {
             trainerService.findByUsername(username);
-            logger.info("Trainer found successfully");
+            logger.info("Trainer: " + username  + " found successfully");
         } catch (IllegalArgumentException e) {
-            logger.error("Trainer not found");
+            logger.error("Trainer: " + username  + " not found");
         }
     }
 
@@ -85,9 +85,9 @@ public class GymFacade {
     public void findTrainingById(String id) {
         try {
             trainingService.findById(id);
-            logger.info("Training found successfully");
+            logger.info("Training: " + id  + " found successfully");
         } catch (IllegalArgumentException e) {
-            logger.error("Training not found");
+            logger.error("Training: " + id  + " not found");
         }
     }
 }
