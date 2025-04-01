@@ -5,7 +5,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.epam.dao.GenericDAO;
+import com.epam.dao.impl.CreateReadDaoImpl;
+// import com.epam.dao.GenericDAO;
 // import com.epam.dao.TraineeDAO;
 import com.epam.model.Trainee;
 
@@ -13,7 +14,7 @@ import com.epam.model.Trainee;
 public class TraineeService {
 
     @Autowired
-    private GenericDAO<Trainee, String> traineeDAO;
+    private CreateReadDaoImpl<Trainee, String> traineeDAO;
 
     public Trainee create(String firstName, String lastName, String dateOfBirth, String address) {
         String username = generateUsername(firstName, lastName);
@@ -41,12 +42,12 @@ public class TraineeService {
     //     return Optional.of(trainee);
     // }
 
-    public void delete(String username) throws IllegalArgumentException {
-        if (!traineeDAO.exists(username)) {
-            throw new IllegalArgumentException("Trainee with username " + username + " not found"); // condition is not defined
-        }
-        traineeDAO.delete(username);
-    }
+    // public void delete(String username) throws IllegalArgumentException {
+    //     if (!traineeDAO.exists(username)) {
+    //         throw new IllegalArgumentException("Trainee with username " + username + " not found"); // condition is not defined
+    //     }
+    //     traineeDAO.delete(username);
+    // }
 
     public Optional<Trainee> findByUsername(String username) throws IllegalArgumentException {
         if (!traineeDAO.exists(username)) {

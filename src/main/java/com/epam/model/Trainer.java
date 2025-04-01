@@ -1,8 +1,13 @@
 package com.epam.model;
 
-public class Trainer {
+public class Trainer implements Identifiable<String> {
     private final User user;
     private final String specialization;
+
+    @Override
+    public String getId() {
+        return user.getUsername();
+    }
 
     private Trainer(Builder builder) {
         this.user = builder.user;
